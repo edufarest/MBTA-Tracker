@@ -1,0 +1,12 @@
+<h2>Handlebars experiment</h2>
+
+<script id="stops" type="text/x-handlebars-template">
+  {{#each routes}}
+  <h3>{{line}} Line</h3>
+  <h3>Direction: {{direction}}</h3>
+  <h4>Arriving in:{{time}} minutes</h4>
+  <br><br>
+  {{/each}}
+</script>
+
+<div id="showStops"></div>

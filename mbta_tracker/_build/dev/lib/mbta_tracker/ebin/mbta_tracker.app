@@ -13,7 +13,6 @@
                         'Elixir.MbtaTrackerWeb.LayoutView',
                         'Elixir.MbtaTrackerWeb.PageController',
                         'Elixir.MbtaTrackerWeb.PageView',
-                        'Elixir.MbtaTrackerWeb.RoomChannel',
                         'Elixir.MbtaTrackerWeb.Router',
                         'Elixir.MbtaTrackerWeb.Router.Helpers',
                         'Elixir.MbtaTrackerWeb.UserSocket']},
