@@ -1,12 +1,7 @@
-<h2>Handlebars experiment</h2>
+<h1>API Experiment</h1>
 
-<script id="stops" type="text/x-handlebars-template">
-  {{#each routes}}
-  <h3>{{line}} Line</h3>
-  <h3>Direction: {{direction}}</h3>
-  <h4>Arriving in:{{time}} minutes</h4>
-  <br><br>
-  {{/each}}
-</script>
+<% route = MbtaTracker.getStop!(42.346961, -71.076640) %>
 
-<div id="showStops"></div>
+<h3>Mode: <%= route["mode_name"] %></h3>
+<h3>Trip: <%= Enum.at(Enum.at(Enum.at(route["route"], 0)["direction"], 0)["trip"], 0)["trip_headsign"] %></h3>
+<h5>Arriving in: <%= round(String.to_integer(Enum.at(Enum.at(Enum.at(route["route"], 0)["direction"], 0)["trip"], 0)["pre_away"])/60) %> minutes</h5>
