@@ -52,17 +52,13 @@ let socket = new Socket("/socket", {params: {token: window.userToken}})
 // from connect if you don't care about authentication.
 
 socket.connect()
+let handlebars = require("handlebars")
 
 // Now that you are connected, you can join channels with a topic:
 let channel = socket.channel("room:routes", {})
-let docDest = document.querySelector("#dest")
-let docLine = document.querySelector("#line")
-let docArr  = document.querySelector("#arrive")
-let trigger = document.querySelector("#trigger")
 
-let line = "Orange Line"
-let destination = "Forest Hills"
-var arrive = 500 // Seconds to arrive 
+let position = document.querySelector("#position");
+
 
 
 channel.join()
@@ -73,20 +69,65 @@ channel.join()
 trigger.addEventListener("click", event => {
     console.log("Updating")
 
-    // Update the arrive time
-    arrive = arrive - 10;
+    let lat = position.dataset.lat;
+    let lon = position.dataset.lon;
 
-    let arriveMinutes = arrive / 60
-    channel.push("route-update", {line: line, destination: destination, arrive: arriveMinutes})
-
+    channel.push("location", {lat: lat, lon: lon})
 })
 
 
 
 channel.on("route-update", payload => {
-    docLine.innerText = payload.line
-    docDest.innerText = payload.destination
-    docArr.innerHTML = "<h6>Arriving in " + payload.arrive +" minutes</h6>"
+
+    // console.log(payload.body)
+
+    var body = JSON.parse(JSON.stringify(payload.body));
+
+    var data = [{}];
+
+    data.mode = body.mode[0].mode_name
+    data.trips = [];
+
+    // console.log(data)
+
+    let routes = body.mode[0].route;
+
+    for (var i = 0; i < routes.length; i++) {
+    	let route = routes[i];
+    	let route_name = route.route_name;
+
+    	console.log(route.direction[0].trip)
+
+    	for (var j = 0; j < route.direction[0].trip.length; j++) {
+
+    		let trip = route.direction[0].trip[j]
+    		// console.log(trip)
+
+    		let headsign = trip.trip_headsign
+    		let arrival = parseInt(trip.pre_away / 60)
+
+    		let jTrip = {"route_name" : route_name, "headsign" : headsign, "arrival" : arrival};
+    		// console.log(jTrip)
+
+    		data.trips.push(jTrip)
+
+    	}
+    }
+
+    console.log(data)
+
+    data.stop_name = body.stop_name
+
+    // Update view
+
+    let trips = $($("#trips")[0]);
+
+    let code = trips.html();
+
+    let tmpl = handlebars.compile(code)
+    let html = tmpl(data)
+
+    $("#showTrips").html(html);
 })
 
 export default socket

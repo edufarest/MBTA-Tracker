@@ -12,18 +12,90 @@
   </head>
 
   <body>
-    <div class="container">
-      <header class="header">
-        <nav role="navigation">
-          <ul class="nav nav-pills pull-right">
-            <li><a href="http://www.phoenixframework.org/docs">Get Started</a></li>
-          </ul>
-        </nav>
-        <span class="logo"></span>
-      </header>
+    
+    <div id="position" data-lat=0 data-lon=0 hidden>
+    </div>
 
-      <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
-      <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
+    <!-- Update every 15s -->
+
+<input type="button" id="trigger"/>
+
+    <script>
+
+      let button = document.getElementById('trigger')
+      button.style.visibility = 'hidden'
+
+
+      // Taken from w3schools
+var pos = document.getElementById("position");
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(savePosition);
+    } else {
+        console.log("Geolocation is not supported by this browser.");
+    }
+}
+function savePosition(position) {
+    pos.dataset.lat = position.coords.latitude; 
+    pos.dataset.lon = position.coords.longitude; 
+}
+
+getLocation()
+button.click()
+
+setInterval(function() {
+  getLocation();
+  button.click();
+  }, 15000)
+
+</script>
+
+<%= if get_flash(@conn, :info) do %>
+  <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
+<% end %>
+<%= if get_flash(@conn, :error) do %>
+  <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
+<% end %>
+
+    <script id="trips" type="text/x-handlebars-template">
+      <nav class="navbar navbar-light" style="background-color: #00ce00;">
+        <a class="navbar-brand" href="#">
+            <img src= <%= static_path(@conn, "/images/MBTA.svg.png") %> width="30" height="30" class="d-inline-block align-top" alt="">
+            MBTA Tracker
+        </a>
+        <span class="navbar-text">
+            Nearest Stop: {{stop_name}}
+        </span>
+    </nav>
+
+    <br>
+    <br>
+    
+    {{#each trips}}
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-10">
+          <div class="card" style="background-color: #ffe243; border-color: #000000;">
+            <div class="card-body">
+              <p class="card-title">{{route_name}} to {{headsign}}</p>
+              <p class="card-text">Arriving in: {{arrival}} minutes</p>
+            </div>
+          </div>
+          <br>
+        </div>
+        {{/each}}
+      </div>
+
+    </div>
+
+  </script>
+
+  <div id="showTrips">
+    
+    <div class="jumbotron">
+      <h1 class="display-3">Loading...</h1>
+    </div>
+  </div>
 
       <main role="main">
         <%= render @view_module, @view_template, assigns %>
